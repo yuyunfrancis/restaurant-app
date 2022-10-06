@@ -1,94 +1,13 @@
-// import { SafeAreaView, ScrollView, StyleSheet, Text, View } from "react-native";
-// import React, { useEffect, useState } from "react";
-// import { Searchbar } from "react-native-paper";
-// import { useNavigation } from "@react-navigation/native";
-
-// import useDataFetching from "../hooks/useDataFetching";
-// import { config } from "../constants/config";
-// import { Error, Loader } from "../components";
-
-// const HomeScreen = () => {
-//   const navigation = useNavigation();
-
-//   const [loading, error, merchant1, fetchData] = useDataFetching(
-//     `${config.app.api_url}/merchant/query/55_water_st_10041`
-//   );
-
-//   //   useEffect(() => {
-//   //     const updateData = navigation.addListener("focus", () => {
-//   //       fetchData();
-//   //       fetchData2();
-//   //     });
-//   //     return updateData;
-//   //   }, [navigation]);
-
-//   const merchants = merchant1?.merchants?.concat(merchant2?.merchants);
-
-//   //   console.log("====================================");
-//   //   console.log("merchant data", merchants);
-//   //   console.log("====================================");
-
-//   //function to convert address
-
-//   const [searchQuery, setSearchQuery] = useState("");
-//   const onChangeSearch = (query) => {
-//     setSearchQuery(query.split(" ").join("_").toLowerCase());
-//   };
-
-//   const [load, error1, merchant2, fetchData2] = useDataFetching(
-//     `${config.app.api_url}/merchant/query/${searchQuery}`
-//   );
-//   console.log("====================================");
-//   console.log("searchQuery", merchant2?.merchants);
-//   console.log("====================================");
-
-//   return (
-//     <>
-//       <SafeAreaView style={{ flex: 1 }}>
-//         <ScrollView>
-//           <View style={{ marginVertical: 20, marginHorizontal: 10 }}>
-//             <Searchbar
-//               placeholder="Search Restaurant"
-//               placeholderTextColor="#D2D1D1"
-//               onChangeText={onChangeSearch}
-//               value={searchQuery}
-//               style={{
-//                 elevation: 0,
-//                 borderWidth: 0.5,
-//                 borderColor: "gray",
-//               }}
-//               inputStyle={{
-//                 fontSize: 14,
-//                 // fontFamily: "Poppins_Regular",
-//               }}
-//               iconColor="#D2D1D1"
-//             />
-//           </View>
-//           {load || error1 ? (
-//             <>{load === true && <Loader />}</>
-//           ) : (
-//             <View>
-//               <Text>Loaded</Text>
-//             </View>
-//           )}
-//         </ScrollView>
-//       </SafeAreaView>
-//     </>
-//   );
-// };
-
-// export default HomeScreen;
-
-// const styles = StyleSheet.create({});
-
 import React, { useEffect, useState } from "react";
 import {
   Dimensions,
   Image,
+  RefreshControl,
   SafeAreaView,
   StyleSheet,
   Text,
   View,
+  Keyboard,
 } from "react-native";
 import {
   FlatList,
@@ -104,10 +23,8 @@ import { Searchbar } from "react-native-paper";
 import useDataFetching from "../hooks/useDataFetching";
 import { config } from "../constants/config";
 import { Error, Loader } from "../components";
-import categories from "../constants/categories";
 import COLORS from "../constants/colors";
-import foods from "../constants/food";
-import { useNavigation } from "@react-navigation/native";
+import { useIsFocused } from "@react-navigation/native";
 
 const { width } = Dimensions.get("screen");
 const cardWidth = width / 2 - 20;
@@ -121,6 +38,9 @@ const HomeScreen = ({ navigation }) => {
     `${config.app.api_url}/merchant/query/55_water_st_10041`
   );
 
+  const [filterData, setFilterData] = useState([]);
+  const [focus, setFocus] = useState(false);
+
   useEffect(() => {
     const updateData = navigation.addListener("focus", () => {
       fetchData();
@@ -128,31 +48,43 @@ const HomeScreen = ({ navigation }) => {
     return updateData;
   }, [navigation]);
 
-  const merchants = merchant1?.merchants?.concat(merchant2?.merchants);
-
-  //function to convert address
-  const [searchQuery, setSearchQuery] = useState("");
-  const onChangeSearch = (query) => {
-    setSearchQuery(query.split(" ").join("_").toLowerCase());
-  };
-
-  const [load, error1, merchant2, fetchData2] = useDataFetching(
-    `${config.app.api_url}/merchant/query/${searchQuery}`
-  );
-
   const cuisine = merchant1?.merchants?.map((item) => item.cuisines[0]);
   let uniqueCuisine = cuisine?.filter((c, index) => {
     return cuisine?.indexOf(c) === index;
   });
 
   const meal = [];
-  uniqueCuisine.map((item) => {
+  uniqueCuisine?.map((item) => {
     meal.push({ name: item });
   });
 
-  console.log("====================================");
-  console.log(meal);
-  console.log("====================================");
+  //search function
+
+  const searchFilterFunction = (text) => {
+    if (text) {
+      const newData = merchant1?.merchants.filter((item) => {
+        const itemData =
+          item.location.state && item.location.zip
+            ? `${item.location.state} ${item.location.zip}`
+                .split(" ")
+                .join("_")
+                .toLowerCase()
+            : "".toLocaleLowerCase();
+
+        const textData = text.split(" ").join("_").toLowerCase();
+        return itemData.indexOf(textData) > -1;
+      });
+      setFilterData(newData);
+    } else {
+      setFilterData([]);
+    }
+  };
+
+  const isFocused = useIsFocused();
+
+  const onFocused = () => {
+    isFocused ? setFocus(true) : setFocus(false);
+  };
 
   const ListCategories = () => {
     return (
@@ -182,10 +114,6 @@ const HomeScreen = ({ navigation }) => {
                   size={18}
                   color={COLORS.primary}
                 />
-                {/* <Image
-                  source={category.image}
-                  style={{ height: 35, width: 35, resizeMode: "cover" }}
-                /> */}
               </View>
               <Text
                 numberOfLines={1}
@@ -256,7 +184,7 @@ const HomeScreen = ({ navigation }) => {
           <View style={{ flexDirection: "row" }}>
             <Text style={{ fontSize: 28 }}>Hello,</Text>
             <Text style={{ fontSize: 28, fontWeight: "bold", marginLeft: 10 }}>
-              Ariz
+              Francis
             </Text>
           </View>
           <Text style={{ marginTop: 5, fontSize: 22, color: COLORS.grey }}>
@@ -264,7 +192,7 @@ const HomeScreen = ({ navigation }) => {
           </Text>
         </View>
         <Image
-          source={require("../../assets/imgaes/person.png")}
+          source={require("../../assets/imgaes/person.jpg")}
           style={{ height: 50, width: 50, borderRadius: 25 }}
         />
       </View>
@@ -280,8 +208,9 @@ const HomeScreen = ({ navigation }) => {
           <TextInput
             style={{ flex: 1, fontSize: 18 }}
             placeholder="Search for food"
-            onChangeText={onChangeSearch}
-            value={searchQuery}
+            onChangeText={searchFilterFunction}
+            onFocus={onFocused}
+            // value={searchQuery}
           />
         </View>
         <View style={style.sortBtn}>
@@ -295,17 +224,37 @@ const HomeScreen = ({ navigation }) => {
         <Loader />
       ) : (
         <>
-          {merchant1?.merchants?.length > 0 ? (
+          {!focus && merchant1?.merchants?.length > 0 ? (
             <FlatList
               showsVerticalScrollIndicator={false}
               numColumns={2}
               data={merchant1?.merchants}
+              refreshControl={
+                <RefreshControl refreshing={loading} onRefresh={fetchData} />
+              }
               renderItem={({ item }) => <Card food={item} />}
             />
           ) : (
-            <View>
-              <Text>There are no restaurants</Text>
-            </View>
+            <>
+              {filterData.length === 0 ? (
+                <View>
+                  <Text>Restaurant not Found</Text>
+                </View>
+              ) : (
+                <FlatList
+                  showsVerticalScrollIndicator={false}
+                  numColumns={2}
+                  data={filterData}
+                  refreshControl={
+                    <RefreshControl
+                      refreshing={loading}
+                      onRefresh={fetchData}
+                    />
+                  }
+                  renderItem={({ item }) => <Card food={item} />}
+                />
+              )}
+            </>
           )}
         </>
       )}
