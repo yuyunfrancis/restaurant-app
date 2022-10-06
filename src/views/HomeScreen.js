@@ -18,11 +18,10 @@ import {
 } from "react-native-gesture-handler";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import Icons from "react-native-vector-icons/Ionicons";
-import { Searchbar } from "react-native-paper";
 
 import useDataFetching from "../hooks/useDataFetching";
 import { config } from "../constants/config";
-import { Error, Loader } from "../components";
+import { Loader } from "../components";
 import COLORS from "../constants/colors";
 import { useIsFocused } from "@react-navigation/native";
 
@@ -81,10 +80,6 @@ const HomeScreen = ({ navigation }) => {
   };
 
   const isFocused = useIsFocused();
-
-  const onFocused = () => {
-    isFocused ? setFocus(true) : setFocus(false);
-  };
 
   const ListCategories = () => {
     return (
@@ -209,7 +204,7 @@ const HomeScreen = ({ navigation }) => {
             style={{ flex: 1, fontSize: 18 }}
             placeholder="Search for food"
             onChangeText={searchFilterFunction}
-            onFocus={onFocused}
+            onFocus={() => setFocus(true)}
             // value={searchQuery}
           />
         </View>
