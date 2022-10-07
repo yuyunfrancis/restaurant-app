@@ -28,13 +28,13 @@ import { useIsFocused } from "@react-navigation/native";
 const { width } = Dimensions.get("screen");
 const cardWidth = width / 2 - 20;
 
-const HomeScreen = ({ navigation }) => {
+const HomeScreen2 = ({ navigation }) => {
   const [selectedCategoryIndex, setSelectedCategoryIndex] = React.useState(0);
 
   // const navigation = useNavigation();
 
   const [loading, error, merchant1, fetchData] = useDataFetching(
-    `${config.app.api_url}/merchant/query/55_water_st_10041`
+    `${config.app.api_url}/merchant/query/232_willow_ave_07030`
   );
 
   const [filterData, setFilterData] = useState([]);
@@ -194,7 +194,6 @@ const HomeScreen = ({ navigation }) => {
           style={{ height: 50, width: 50, borderRadius: 25 }}
         />
       </View>
-
       <View
         style={{
           marginTop: 40,
@@ -328,4 +327,4 @@ const style = StyleSheet.create({
   },
 });
 
-export default HomeScreen;
+export default HomeScreen2;

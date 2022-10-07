@@ -3,8 +3,8 @@ import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import { View } from "react-native";
-import HomeScreen from "../views/HomeScreen";
 import COLORS from "../constants/colors";
+import { HomeScreen, HomeScreen1, HomeScreen2, HomeScreen3 } from "../views";
 
 const Tab = createBottomTabNavigator();
 
@@ -32,7 +32,7 @@ const BottomNavigator = () => {
       />
       <Tab.Screen
         name="LocalMall"
-        component={HomeScreen}
+        component={HomeScreen1}
         options={{
           tabBarIcon: ({ color }) => (
             <Icon name="local-mall" color={color} size={28} />
@@ -65,7 +65,7 @@ const BottomNavigator = () => {
       />
       <Tab.Screen
         name="Favorite"
-        component={HomeScreen}
+        component={HomeScreen2}
         options={{
           tabBarIcon: ({ color }) => (
             <Icon name="favorite" color={color} size={28} />
@@ -74,7 +74,7 @@ const BottomNavigator = () => {
       />
       <Tab.Screen
         name="Cart"
-        component={HomeScreen}
+        component={HomeScreen3}
         options={{
           tabBarIcon: ({ color }) => (
             <Icon name="shopping-cart" color={color} size={28} />
